@@ -8,7 +8,7 @@
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
-    "package-prerelease": "ncc build lib/prerelease.js --out dist/prerelease --source-map --license licenses.txt",
+    "package-prerelease": "ncc build lib/prerelease.js --out prerelease/dist --source-map --license licenses.txt",
     "package-release": "ncc build lib/release.js --out release/dist --source-map --license licenses.txt",
     "package": "npm run package-prerelease && npm run package-release",
     "test": "jest",
