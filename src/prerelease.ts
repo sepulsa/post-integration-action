@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import {exec} from '@actions/exec'
 import yn from 'yn'
 import findKey from './find-key'
-import gitTag from './git-tag'
+import {prereleaseTag} from './tag'
 
 async function run(): Promise<void> {
   try {
@@ -12,7 +12,7 @@ async function run(): Promise<void> {
       return
     }
     const tag = await core.group('Get prerelease tag', async () => {
-      return gitTag()
+      return prereleaseTag()
     })
 
     const push = yn(core.getInput('push', {required: true}))
