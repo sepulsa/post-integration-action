@@ -15,10 +15,25 @@ jobs:
           npm install
       - run: |
           npm run all
-  test: # make sure the action works on a clean machine without building
+  prerelease: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch:
+          - feature/jira-123-branch
+          - feature/jira-123
+          - jira-123-branch
+          - jira-123
     steps:
       - uses: actions/checkout@v2
-      - uses: ./
+      - id: prerelease
+        uses: ./prerelease
         with:
-          milliseconds: 1000
+          branch: ${{ matrix.branch }}
+          push: false
+      - run: if [[ "$KEY" == "JIRA-123" ]]; then exit 0; else exit 1; fi
+        env:
+          KEY: ${{ steps.prerelease.outputs.key }}
+      - run: if [[ "$TAG" == "1.1.0-rc.0" ]]; then exit 0; else exit 1; fi
+        env:
+          TAG: ${{ steps.prerelease.outputs.tag }}
