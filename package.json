@@ -1,9 +1,8 @@
 {
-  "name": "typescript-action",
+  "name": "@sepulsa/post-integration-action",
   "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
-  "main": "lib/main.js",
+  "description": "Post-Integration action",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write **/*.ts",
@@ -15,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/sepulsa/post-integration-action.git"
   },
   "keywords": [
     "actions",
