@@ -16,4 +16,4 @@ outputs:
     description: 'Prerelease tag'
 runs:
   using: 'node12'
-  main: '../dist/prerelease/index.js'
+  main: 'dist/index.js'
