@@ -1,60 +1,48 @@
 import {exec} from '@actions/exec'
 import {prerelease, SemVer, sort, valid} from 'semver'
 
-export async function prereleaseTag(): Promise<string> {
-  let output = ''
+const SEMVER_PATTERN = '[v0-9]*.[0-9]*.[0-9]*'
 
-  await exec('git', ['config', 'versionsort.suffix', '-'])
-  await exec(
-    'git',
-    ['tag', '--list', '--sort', 'v:refname', '[v0-9]*.[0-9]*.[0-9]*'],
-    {
-      listeners: {
-        stdout: (data: Buffer) => {
-          output += data.toString()
-        }
-      }
+let output: Buffer
+
+async function listTags(args: string[]): Promise<number> {
+  return exec('git', ['tag', '--list'].concat(args), {
+    listeners: {
+      stdout
     }
-  )
+  })
+}
 
-  // Filter invalid semver tag
-  const tags = output
-    .trim()
-    .split('\n')
-    .filter(tag => valid(tag))
+function stdout(data: Buffer): void {
+  output = data
+}
 
-  const semver = new SemVer(sort(tags).pop() || '1.0.0')
+function tagsFromBuffer(buffer: Buffer): string[] {
+  return buffer.toString().trim().split('\n')
+}
+
+export async function prereleaseTag(): Promise<string> {
+  await exec('git', ['config', 'versionsort.suffix', '-'])
+  await listTags(['--sort', 'v:refname', SEMVER_PATTERN])
+
+  let semver: SemVer
+  if (output) {
+    // Filter invalid semver tag
+    const tags = tagsFromBuffer(output).filter(tag => valid(tag))
+    semver = new SemVer(sort(tags).pop() || '1.0.0')
+  } else {
+    semver = new SemVer('1.0.0')
+  }
+
   return semver.inc('preminor', 'rc').version
 }
 
 export async function prereleaseTagFromKey(
   key: string
 ): Promise<string | undefined> {
-  let output = ''
+  await listTags(['--ignore-case', '--points-at', key, SEMVER_PATTERN])
 
-  await exec(
-    'git',
-    [
-      'tag',
-      '--list',
-      '--ignore-case',
-      '--points-at',
-      key,
-      '[0-9]*.[0-9]*.[0-9]*'
-    ],
-    {
-      listeners: {
-        stdout: (data: Buffer) => {
-          output += data.toString().trim()
-        }
-      }
-    }
-  )
-
-  const tags = output
-    .trim()
-    .split('\n')
-    .filter(tag => prerelease(tag))
+  const tags = tagsFromBuffer(output).filter(tag => prerelease(tag))
 
   return sort(tags).pop()
 }
