@@ -1,0 +1,19 @@
+name: 'Post-Integration: Prerelease Action'
+description: 'Prerelease action for post-integration'
+author: 'sepulsa'
+inputs:
+  branch:
+    required: true
+    description: 'Branch name, must contain JIRA issue key'
+  push:
+    required: true
+    description: 'Push tags if true'
+    default: 'true'
+outputs:
+  key:
+    description: 'JIRA issue key'
+  tag:
+    description: 'Prerelease tag'
+runs:
+  using: 'node12'
+  main: '../dist/prerelease/index.js'
