@@ -108,48 +108,44 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.releaseTag = exports.prereleaseTagFromKey = exports.prereleaseTag = void 0;
 const exec_1 = __webpack_require__(1514);
 const semver_1 = __webpack_require__(1383);
-function prereleaseTag() {
+const SEMVER_PATTERN = '[v0-9]*.[0-9]*.[0-9]*';
+let output;
+function listTags(args) {
     return __awaiter(this, void 0, void 0, function* () {
-        let output = '';
-        yield exec_1.exec('git', ['config', 'versionsort.suffix', '-']);
-        yield exec_1.exec('git', ['tag', '--list', '--sort', 'v:refname', '[v0-9]*.[0-9]*.[0-9]*'], {
+        return exec_1.exec('git', ['tag', '--list'].concat(args), {
             listeners: {
-                stdout: (data) => {
-                    output += data.toString();
-                }
+                stdout
             }
         });
-        // Filter invalid semver tag
-        const tags = output
-            .trim()
-            .split('\n')
-            .filter(tag => semver_1.valid(tag));
-        const semver = new semver_1.SemVer(semver_1.sort(tags).pop() || '1.0.0');
+    });
+}
+function stdout(data) {
+    output = data;
+}
+function tagsFromBuffer(buffer) {
+    return buffer.toString().trim().split('\n');
+}
+function prereleaseTag() {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield exec_1.exec('git', ['config', 'versionsort.suffix', '-']);
+        yield listTags(['--sort', 'v:refname', SEMVER_PATTERN]);
+        let semver;
+        if (output) {
+            // Filter invalid semver tag
+            const tags = tagsFromBuffer(output).filter(tag => semver_1.valid(tag));
+            semver = new semver_1.SemVer(semver_1.sort(tags).pop() || '1.0.0');
+        }
+        else {
+            semver = new semver_1.SemVer('1.0.0');
+        }
         return semver.inc('preminor', 'rc').version;
     });
 }
 exports.prereleaseTag = prereleaseTag;
 function prereleaseTagFromKey(key) {
     return __awaiter(this, void 0, void 0, function* () {
-        let output = '';
-        yield exec_1.exec('git', [
-            'tag',
-            '--list',
-            '--ignore-case',
-            '--points-at',
-            key,
-            '[0-9]*.[0-9]*.[0-9]*'
-        ], {
-            listeners: {
-                stdout: (data) => {
-                    output += data.toString().trim();
-                }
-            }
-        });
-        const tags = output
-            .trim()
-            .split('\n')
-            .filter(tag => semver_1.prerelease(tag));
+        yield listTags(['--ignore-case', '--points-at', key, SEMVER_PATTERN]);
+        const tags = tagsFromBuffer(output).filter(tag => semver_1.prerelease(tag));
         return semver_1.sort(tags).pop();
     });
 }
