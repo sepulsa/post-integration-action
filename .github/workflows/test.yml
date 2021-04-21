@@ -8,7 +8,7 @@ on: # rebuild any PRs and main branch changes
 
 jobs:
   build: # make sure build/ci work properly
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - run: |
@@ -16,7 +16,7 @@ jobs:
       - run: |
           npm run all
   prerelease: # make sure the action works on a clean machine without building
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         branch:
@@ -37,3 +37,21 @@ jobs:
       - run: if [[ "$TAG" == "1.1.0-rc.0" ]]; then exit 0; else exit 1; fi
         env:
           TAG: ${{ steps.prerelease.outputs.tag }}
+
+  release:
+    runs-on: ubuntu-20.04
+    environment: staging:JIRA-123
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          git tag JIRA-123
+          git tag 1.1.0-rc.0
+      - id: release
+        uses: ./release
+        with:
+          key: JIRA-123
+          token: ${{ secrets.RELEASE_TOKEN }}
+          push: false
+      - run: if [[ "$TAG" == "1.1.0" ]]; then exit 0; else exit 1; fi
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
