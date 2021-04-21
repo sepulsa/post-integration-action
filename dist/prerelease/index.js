@@ -18,48 +18,6 @@ exports.default = findKey;
 
 /***/ }),
 
-/***/ 1734:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const exec_1 = __webpack_require__(1514);
-const semver_1 = __webpack_require__(1383);
-function gitTag() {
-    return __awaiter(this, void 0, void 0, function* () {
-        let output = '';
-        yield exec_1.exec('git', ['config', 'versionsort.suffix', '-']);
-        yield exec_1.exec('git', ['tag', '--list', '--sort', 'v:refname', '[0-9]*.[0-9]*.[0-9]*'], {
-            listeners: {
-                stdout: (data) => {
-                    output += data.toString();
-                }
-            }
-        });
-        // Filter invalid semver tag
-        const tags = output
-            .trim()
-            .split('\n')
-            .filter(tag => semver_1.valid(tag));
-        const semver = new semver_1.SemVer(semver_1.sort(tags).pop() || '1.0.0');
-        return semver.inc('preminor', 'rc').version;
-    });
-}
-exports.default = gitTag;
-
-
-/***/ }),
-
 /***/ 7221:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
@@ -101,7 +59,7 @@ const core = __importStar(__webpack_require__(2186));
 const exec_1 = __webpack_require__(1514);
 const yn_1 = __importDefault(__webpack_require__(9647));
 const find_key_1 = __importDefault(__webpack_require__(1731));
-const git_tag_1 = __importDefault(__webpack_require__(1734));
+const tag_1 = __webpack_require__(2829);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -111,12 +69,12 @@ function run() {
                 return;
             }
             const tag = yield core.group('Get prerelease tag', () => __awaiter(this, void 0, void 0, function* () {
-                return git_tag_1.default();
+                return tag_1.prereleaseTag();
             }));
-            yield exec_1.exec('git', ['tag', key]);
-            yield exec_1.exec('git', ['tag', tag]);
             const push = yn_1.default(core.getInput('push', { required: true }));
             if (push) {
+                yield exec_1.exec('git', ['tag', key]);
+                yield exec_1.exec('git', ['tag', tag]);
                 yield exec_1.exec('git', ['push', '--tags']);
             }
             core.setOutput('key', key);
@@ -128,6 +86,79 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 2829:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.releaseTag = exports.prereleaseTagFromKey = exports.prereleaseTag = void 0;
+const exec_1 = __webpack_require__(1514);
+const semver_1 = __webpack_require__(1383);
+function prereleaseTag() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let output = '';
+        yield exec_1.exec('git', ['config', 'versionsort.suffix', '-']);
+        yield exec_1.exec('git', ['tag', '--list', '--sort', 'v:refname', '[v0-9]*.[0-9]*.[0-9]*'], {
+            listeners: {
+                stdout: (data) => {
+                    output += data.toString();
+                }
+            }
+        });
+        // Filter invalid semver tag
+        const tags = output
+            .trim()
+            .split('\n')
+            .filter(tag => semver_1.valid(tag));
+        const semver = new semver_1.SemVer(semver_1.sort(tags).pop() || '1.0.0');
+        return semver.inc('preminor', 'rc').version;
+    });
+}
+exports.prereleaseTag = prereleaseTag;
+function prereleaseTagFromKey(key) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let output = '';
+        yield exec_1.exec('git', [
+            'tag',
+            '--list',
+            '--ignore-case',
+            '--points-at',
+            key,
+            '[0-9]*.[0-9]*.[0-9]*'
+        ], {
+            listeners: {
+                stdout: (data) => {
+                    output += data.toString().trim();
+                }
+            }
+        });
+        const tags = output
+            .trim()
+            .split('\n')
+            .filter(tag => semver_1.prerelease(tag));
+        return semver_1.sort(tags).pop();
+    });
+}
+exports.prereleaseTagFromKey = prereleaseTagFromKey;
+function releaseTag(prerelease_tag) {
+    const semver = new semver_1.SemVer(prerelease_tag);
+    return semver.inc('minor').version;
+}
+exports.releaseTag = releaseTag;
 
 
 /***/ }),
