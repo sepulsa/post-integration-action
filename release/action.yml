@@ -1,0 +1,20 @@
+name: 'Post-Integration: Prerelease Action'
+description: 'Release action for post-integration'
+author: 'sepulsa'
+inputs:
+  key:
+    required: true
+    description: 'JIRA issue key'
+  token:
+    required: true
+    description: 'Github Personal Access Token with permission to delete environment'
+  push:
+    required: true
+    description: 'Push tags if true'
+    default: 'true'
+outputs:
+  tag:
+    description: 'Release tag'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
