@@ -1,4 +1,4 @@
-import {deleteEnvironment} from '../src/environment'
+import deleteEnvironment from '../src/environment'
 
 test('Delete invalid environment', async () => {
   const key = 'JIRA-404'

@@ -36,7 +36,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.deleteEnvironment = void 0;
 const core = __importStar(__webpack_require__(2186));
 const github = __importStar(__webpack_require__(5438));
 function deleteEnvironment(token, key) {
@@ -46,8 +45,8 @@ function deleteEnvironment(token, key) {
                 debug: core.debug,
                 info: core.info,
                 warn: core.warning,
-                error: core.error
-            }
+                error: core.error,
+            },
         });
         try {
             const { status } = yield octokit.repos.deleteAnEnvironment(Object.assign({ environment_name: `staging:${key}` }, github.context.repo));
@@ -59,7 +58,7 @@ function deleteEnvironment(token, key) {
         }
     });
 }
-exports.deleteEnvironment = deleteEnvironment;
+exports.default = deleteEnvironment;
 
 
 /***/ }),
@@ -104,33 +103,33 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__webpack_require__(2186));
 const exec_1 = __webpack_require__(1514);
 const yn_1 = __importDefault(__webpack_require__(9647));
-const environment_1 = __webpack_require__(3309);
+const environment_1 = __importDefault(__webpack_require__(3309));
 const tag_1 = __webpack_require__(2829);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const key = core.getInput('key', { required: true }).toUpperCase();
             const token = core.getInput('token', { required: true });
-            const prerelease_tag = yield tag_1.prereleaseTagFromKey(key);
-            if (prerelease_tag === undefined) {
+            const prereleaseTag = yield tag_1.prereleaseTagFromKey(key);
+            if (prereleaseTag === undefined) {
                 core.setFailed("Can't find prerelease tag");
                 return;
             }
-            const release_tag = tag_1.releaseTag(prerelease_tag);
+            const releaseTag = tag_1.releaseTagFromPrerelease(prereleaseTag);
             const push = yn_1.default(core.getInput('push', { required: true }));
             if (push) {
                 yield core.group('Create release tag', () => __awaiter(this, void 0, void 0, function* () {
-                    yield exec_1.exec('git', ['tag', release_tag, key]);
-                    yield exec_1.exec('git', ['push', 'origin', release_tag]);
+                    yield exec_1.exec('git', ['tag', releaseTag, key]);
+                    yield exec_1.exec('git', ['push', 'origin', releaseTag]);
                 }));
                 yield core.group('Clean up prerelease tag', () => __awaiter(this, void 0, void 0, function* () {
-                    yield exec_1.exec('git', ['tag', '--delete', prerelease_tag, key]);
+                    yield exec_1.exec('git', ['tag', '--delete', prereleaseTag, key]);
                     yield exec_1.exec('git', ['push', '--delete', 'origin', key]);
-                    yield exec_1.exec('git', ['push', '--delete', 'origin', prerelease_tag]);
+                    yield exec_1.exec('git', ['push', '--delete', 'origin', prereleaseTag]);
                 }));
             }
-            yield environment_1.deleteEnvironment(token, key);
-            core.setOutput('tag', release_tag);
+            yield environment_1.default(token, key);
+            core.setOutput('tag', releaseTag);
         }
         catch (error) {
             core.setFailed(error.message);
@@ -157,22 +156,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.releaseTag = exports.prereleaseTagFromKey = exports.prereleaseTag = void 0;
+exports.releaseTagFromPrerelease = exports.prereleaseTagFromKey = exports.prereleaseTag = void 0;
 const exec_1 = __webpack_require__(1514);
 const semver_1 = __webpack_require__(1383);
 const SEMVER_PATTERN = '[v0-9]*.[0-9]*.[0-9]*';
 let output;
+function stdout(data) {
+    output = data;
+}
 function listTags(args) {
     return __awaiter(this, void 0, void 0, function* () {
         return exec_1.exec('git', ['tag', '--list'].concat(args), {
             listeners: {
-                stdout
-            }
+                stdout,
+            },
         });
     });
-}
-function stdout(data) {
-    output = data;
 }
 function tagsFromBuffer(buffer) {
     return buffer.toString().trim().split('\n');
@@ -184,7 +183,7 @@ function prereleaseTag() {
         let semver;
         if (output) {
             // Filter invalid semver tag
-            const tags = tagsFromBuffer(output).filter(tag => semver_1.valid(tag));
+            const tags = tagsFromBuffer(output).filter((tag) => semver_1.valid(tag));
             semver = new semver_1.SemVer(semver_1.sort(tags).pop() || '1.0.0');
         }
         else {
@@ -197,16 +196,16 @@ exports.prereleaseTag = prereleaseTag;
 function prereleaseTagFromKey(key) {
     return __awaiter(this, void 0, void 0, function* () {
         yield listTags(['--ignore-case', '--points-at', key, SEMVER_PATTERN]);
-        const tags = tagsFromBuffer(output).filter(tag => semver_1.prerelease(tag));
+        const tags = tagsFromBuffer(output).filter((tag) => semver_1.prerelease(tag));
         return semver_1.sort(tags).pop();
     });
 }
 exports.prereleaseTagFromKey = prereleaseTagFromKey;
-function releaseTag(prerelease_tag) {
+function releaseTagFromPrerelease(prerelease_tag) {
     const semver = new semver_1.SemVer(prerelease_tag);
     return semver.inc('minor').version;
 }
-exports.releaseTag = releaseTag;
+exports.releaseTagFromPrerelease = releaseTagFromPrerelease;
 
 
 /***/ }),

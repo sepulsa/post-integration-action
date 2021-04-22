@@ -1,23 +1,19 @@
-import {exec, ExecOptions} from '@actions/exec'
-import {prereleaseTag, prereleaseTagFromKey, releaseTag} from '../src/tag'
+import { exec, ExecOptions } from '@actions/exec'
+import { prereleaseTag, prereleaseTagFromKey, releaseTagFromPrerelease } from '../src/tag'
 
 jest.mock('@actions/exec')
 const mockedExec = exec as jest.Mock<Promise<number>>
 
 function mockExecImplementation(data?: Buffer): void {
   mockedExec.mockImplementation(
-    async (
-      commandLine: string,
-      args?: string[],
-      options?: ExecOptions
-    ): Promise<number> => {
+    async (commandLine: string, args?: string[], options?: ExecOptions): Promise<number> => {
       if (data && options?.listeners?.stdout) {
         options.listeners.stdout(data)
         return 0
       }
 
       return 1
-    }
+    },
   )
 }
 
@@ -31,7 +27,7 @@ describe('prereleaseTag', () => {
     [Buffer.from('1.1.0\nv1.2.0'), '1.3.0-rc.0'],
     [Buffer.from('1.2.0\nv1.1.0'), '1.3.0-rc.0'],
     [Buffer.from('v1.1.0\n1.2.0'), '1.3.0-rc.0'],
-    [Buffer.from('v1.2.0\n1.1.0'), '1.3.0-rc.0']
+    [Buffer.from('v1.2.0\n1.1.0'), '1.3.0-rc.0'],
   ]
   test.concurrent.each(TEST_CASES)('Test case #%#', async (tags, expected) => {
     mockExecImplementation(tags)
@@ -47,19 +43,12 @@ test('No prerelease tag', async () => {
 })
 
 test('Prerelease tag', async () => {
-  const tags = [
-    '1.0.0-rc.0',
-    'v1.0.0-rc.0',
-    '1.1.0-rc.0',
-    '1.2.0',
-    'v1.1.0',
-    'JIRA-999'
-  ]
+  const tags = ['1.0.0-rc.0', 'v1.0.0-rc.0', '1.1.0-rc.0', '1.2.0', 'v1.1.0', 'JIRA-999']
   mockExecImplementation(Buffer.from(tags.join('\n')))
 
   await expect(prereleaseTagFromKey('JIRA-999')).resolves.toEqual('1.1.0-rc.0')
 })
 
 test('Release tag', () => {
-  expect(releaseTag('v1.1.0-rc.0')).toEqual('1.1.0')
+  expect(releaseTagFromPrerelease('v1.1.0-rc.0')).toEqual('1.1.0')
 })

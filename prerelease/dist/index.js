@@ -68,9 +68,7 @@ function run() {
                 core.info("Can't find JIRA issue key");
                 return;
             }
-            const tag = yield core.group('Get prerelease tag', () => __awaiter(this, void 0, void 0, function* () {
-                return tag_1.prereleaseTag();
-            }));
+            const tag = yield core.group('Get prerelease tag', () => __awaiter(this, void 0, void 0, function* () { return tag_1.prereleaseTag(); }));
             const push = yn_1.default(core.getInput('push', { required: true }));
             if (push) {
                 yield exec_1.exec('git', ['tag', key]);
@@ -105,22 +103,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.releaseTag = exports.prereleaseTagFromKey = exports.prereleaseTag = void 0;
+exports.releaseTagFromPrerelease = exports.prereleaseTagFromKey = exports.prereleaseTag = void 0;
 const exec_1 = __webpack_require__(1514);
 const semver_1 = __webpack_require__(1383);
 const SEMVER_PATTERN = '[v0-9]*.[0-9]*.[0-9]*';
 let output;
+function stdout(data) {
+    output = data;
+}
 function listTags(args) {
     return __awaiter(this, void 0, void 0, function* () {
         return exec_1.exec('git', ['tag', '--list'].concat(args), {
             listeners: {
-                stdout
-            }
+                stdout,
+            },
         });
     });
-}
-function stdout(data) {
-    output = data;
 }
 function tagsFromBuffer(buffer) {
     return buffer.toString().trim().split('\n');
@@ -132,7 +130,7 @@ function prereleaseTag() {
         let semver;
         if (output) {
             // Filter invalid semver tag
-            const tags = tagsFromBuffer(output).filter(tag => semver_1.valid(tag));
+            const tags = tagsFromBuffer(output).filter((tag) => semver_1.valid(tag));
             semver = new semver_1.SemVer(semver_1.sort(tags).pop() || '1.0.0');
         }
         else {
@@ -145,16 +143,16 @@ exports.prereleaseTag = prereleaseTag;
 function prereleaseTagFromKey(key) {
     return __awaiter(this, void 0, void 0, function* () {
         yield listTags(['--ignore-case', '--points-at', key, SEMVER_PATTERN]);
-        const tags = tagsFromBuffer(output).filter(tag => semver_1.prerelease(tag));
+        const tags = tagsFromBuffer(output).filter((tag) => semver_1.prerelease(tag));
         return semver_1.sort(tags).pop();
     });
 }
 exports.prereleaseTagFromKey = prereleaseTagFromKey;
-function releaseTag(prerelease_tag) {
+function releaseTagFromPrerelease(prerelease_tag) {
     const semver = new semver_1.SemVer(prerelease_tag);
     return semver.inc('minor').version;
 }
-exports.releaseTag = releaseTag;
+exports.releaseTagFromPrerelease = releaseTagFromPrerelease;
 
 
 /***/ }),
