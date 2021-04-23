@@ -14457,8 +14457,8 @@ const deserializeAws_restXmlInvalidChangeBatchResponse = async (parsedOutput, co
         messages: undefined,
     };
     const data = parsedOutput.body.Error;
-    if (data["message"] !== undefined) {
-        contents.message = data["message"];
+    if (data["Message"] !== undefined) {
+        contents.message = data["Message"];
     }
     if (data.messages === "") {
         contents.messages = [];
@@ -14489,8 +14489,8 @@ const deserializeAws_restXmlInvalidInputResponse = async (parsedOutput, context)
         message: undefined,
     };
     const data = parsedOutput.body.Error;
-    if (data["message"] !== undefined) {
-        contents.message = data["message"];
+    if (data["Message"] !== undefined) {
+        contents.message = data["Message"];
     }
     return contents;
 };
@@ -14723,8 +14723,8 @@ const deserializeAws_restXmlNoSuchHealthCheckResponse = async (parsedOutput, con
         message: undefined,
     };
     const data = parsedOutput.body.Error;
-    if (data["message"] !== undefined) {
-        contents.message = data["message"];
+    if (data["Message"] !== undefined) {
+        contents.message = data["Message"];
     }
     return contents;
 };
@@ -14736,8 +14736,8 @@ const deserializeAws_restXmlNoSuchHostedZoneResponse = async (parsedOutput, cont
         message: undefined,
     };
     const data = parsedOutput.body.Error;
-    if (data["message"] !== undefined) {
-        contents.message = data["message"];
+    if (data["Message"] !== undefined) {
+        contents.message = data["Message"];
     }
     return contents;
 };
@@ -14814,8 +14814,8 @@ const deserializeAws_restXmlPriorRequestNotCompleteResponse = async (parsedOutpu
         message: undefined,
     };
     const data = parsedOutput.body.Error;
-    if (data["message"] !== undefined) {
-        contents.message = data["message"];
+    if (data["Message"] !== undefined) {
+        contents.message = data["Message"];
     }
     return contents;
 };
@@ -16422,6 +16422,7 @@ const loadRestXmlErrorCode = (output, data) => {
     return "";
 };
 //# sourceMappingURL=Aws_restXml.js.map
+
 
 /***/ }),
 
