@@ -49,14 +49,18 @@ async function run(): Promise<void> {
   const dnsRecord = core.getInput('dns-record', options)
   const zoneId = core.getInput('zone-id', options)
 
-  const output = await routeDomain({
-    action,
-    name,
-    type,
-    dnsRecord,
-    zoneId,
-  })
-  core.setOutput('output', output)
+  try {
+    const output = await routeDomain({
+      action,
+      name,
+      type,
+      dnsRecord,
+      zoneId,
+    })
+    core.setOutput('output', output)
+  } catch (error) {
+    core.setFailed(error)
+  }
 }
 
 run()
