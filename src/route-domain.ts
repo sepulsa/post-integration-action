@@ -45,7 +45,7 @@ async function run(): Promise<void> {
 
   const action = core.getInput('action', options).toUpperCase() as ChangeAction
   const name = core.getInput('name', options)
-  const type = core.getInput('name', options).toUpperCase() as RRType
+  const type = core.getInput('type', options).toUpperCase() as RRType
   const dnsRecord = core.getInput('dns-record', options)
   const zoneId = core.getInput('zone-id', options)
 
