@@ -1,5 +1,5 @@
 import { exec } from '@actions/exec'
-import { prerelease, SemVer, sort, valid } from 'semver'
+import * as semver from 'semver'
 
 const SEMVER_PATTERN = '[v0-9]*.[0-9]*.[0-9]*'
 
@@ -25,27 +25,27 @@ export async function prereleaseTag(): Promise<string> {
   await exec('git', ['config', 'versionsort.suffix', '-'])
   await listTags(['--sort', 'v:refname', SEMVER_PATTERN])
 
-  let semver: SemVer
+  let ver: semver.SemVer
   if (output) {
     // Filter invalid semver tag
-    const tags = tagsFromBuffer(output).filter((tag) => valid(tag))
-    semver = new SemVer(sort(tags).pop() || '1.0.0')
+    const tags = tagsFromBuffer(output).filter((tag) => semver.valid(tag))
+    ver = new semver.SemVer(semver.sort(tags).pop() || '1.0.0')
   } else {
-    semver = new SemVer('1.0.0')
+    ver = new semver.SemVer('1.0.0')
   }
 
-  return semver.inc('preminor', 'rc').version
+  return ver.inc('preminor', 'rc').version
 }
 
 export async function prereleaseTagFromKey(key: string): Promise<string | undefined> {
   await listTags(['--ignore-case', '--points-at', key, SEMVER_PATTERN])
 
-  const tags = tagsFromBuffer(output).filter((tag) => prerelease(tag))
+  const tags = tagsFromBuffer(output).filter((tag) => semver.prerelease(tag))
 
-  return sort(tags).pop()
+  return semver.sort(tags).pop()
 }
 
-export function releaseTagFromPrerelease(prerelease_tag: string): string {
-  const semver = new SemVer(prerelease_tag)
-  return semver.inc('minor').version
+export function releaseTagFromPrerelease(tag: string): string {
+  const ver = new semver.SemVer(tag)
+  return ver.inc('minor').version
 }

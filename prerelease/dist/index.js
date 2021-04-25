@@ -93,6 +93,25 @@ run();
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -105,7 +124,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.releaseTagFromPrerelease = exports.prereleaseTagFromKey = exports.prereleaseTag = void 0;
 const exec_1 = __webpack_require__(1514);
-const semver_1 = __webpack_require__(1383);
+const semver = __importStar(__webpack_require__(1383));
 const SEMVER_PATTERN = '[v0-9]*.[0-9]*.[0-9]*';
 let output;
 function stdout(data) {
@@ -127,30 +146,30 @@ function prereleaseTag() {
     return __awaiter(this, void 0, void 0, function* () {
         yield exec_1.exec('git', ['config', 'versionsort.suffix', '-']);
         yield listTags(['--sort', 'v:refname', SEMVER_PATTERN]);
-        let semver;
+        let ver;
         if (output) {
             // Filter invalid semver tag
-            const tags = tagsFromBuffer(output).filter((tag) => semver_1.valid(tag));
-            semver = new semver_1.SemVer(semver_1.sort(tags).pop() || '1.0.0');
+            const tags = tagsFromBuffer(output).filter((tag) => semver.valid(tag));
+            ver = new semver.SemVer(semver.sort(tags).pop() || '1.0.0');
         }
         else {
-            semver = new semver_1.SemVer('1.0.0');
+            ver = new semver.SemVer('1.0.0');
         }
-        return semver.inc('preminor', 'rc').version;
+        return ver.inc('preminor', 'rc').version;
     });
 }
 exports.prereleaseTag = prereleaseTag;
 function prereleaseTagFromKey(key) {
     return __awaiter(this, void 0, void 0, function* () {
         yield listTags(['--ignore-case', '--points-at', key, SEMVER_PATTERN]);
-        const tags = tagsFromBuffer(output).filter((tag) => semver_1.prerelease(tag));
-        return semver_1.sort(tags).pop();
+        const tags = tagsFromBuffer(output).filter((tag) => semver.prerelease(tag));
+        return semver.sort(tags).pop();
     });
 }
 exports.prereleaseTagFromKey = prereleaseTagFromKey;
-function releaseTagFromPrerelease(prerelease_tag) {
-    const semver = new semver_1.SemVer(prerelease_tag);
-    return semver.inc('minor').version;
+function releaseTagFromPrerelease(tag) {
+    const ver = new semver.SemVer(tag);
+    return ver.inc('minor').version;
 }
 exports.releaseTagFromPrerelease = releaseTagFromPrerelease;
 
