@@ -15,7 +15,7 @@
     "package": "npm run package:prerelease && npm run package:release && npm run package:route-domain",
     "test": "jest",
     "all": "npm run format && npm run lint && npm run package && npm test",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package && npm run package"
   },
   "repository": {
     "type": "git",
