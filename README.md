@@ -90,7 +90,7 @@ Valid  values for DNS record `type`: **A** | **AAAA** | **CAA** | **CNAME** | **
     dns-record: ns.example.com
     zone-id: ZONEID
 - id: delete-domain
-  uses: sepulsa/post-integration-action/route-domain@route-domain
+  uses: sepulsa/post-integration-action/route-domain@main
   with:
     action: DELETE
     name: admin.example.com
