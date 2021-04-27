@@ -54,7 +54,7 @@ This action output release tag based on JIRA Issue key.
 
 ## Route Domain
 
-This action `CREATE` or `DELETE` dns record.
+This action `CREATE` or `DELETE` ingress for kubernetes and point dns record to ingress endpoint.
 
 ### Inputs
 |Input|Required|Description|
