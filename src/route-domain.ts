@@ -91,7 +91,7 @@ async function run(): Promise<void> {
       dnsRecord,
       zoneId,
     })
-    core.setOutput('output', output)
+    core.setOutput('route', output)
   } catch (error) {
     core.setFailed(error)
   }

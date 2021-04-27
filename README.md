@@ -80,7 +80,7 @@ Valid  values for DNS record `type`: **A** | **AAAA** | **CAA** | **CNAME** | **
 |Output|Description|
 |------|---|
 |`ingress`|Ingress response from kubernetes|
-|`output`|A complex type that contains information about changes made to your hosted zone|
+|`route`|A complex type that contains information about changes made to your hosted zone|
 
 ### Example usage
 
