@@ -48,7 +48,7 @@ inputs:
 outputs:
   ingress:
     description: 'Ingress response from kubernetes'
-  output:
+  route:
     description: 'A complex type that contains information about changes made to your hosted zone'
 runs:
   using: 'node12'
