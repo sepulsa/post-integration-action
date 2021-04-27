@@ -110,7 +110,7 @@ Valid  values for DNS record `type`: **A** | **AAAA** | **CAA** | **CNAME** | **
     location: $GKE_REGION
 
 - id: create-domain
-  uses: sepulsa/post-integration-action/route-domain@route-domain
+  uses: sepulsa/post-integration-action/route-domain@ingress
   with:
     action: CREATE
     name: admin.example.com
@@ -123,7 +123,7 @@ Valid  values for DNS record `type`: **A** | **AAAA** | **CAA** | **CNAME** | **
     ingress-service-name: service
     ingress-service-port: 443
 - id: delete-domain
-  uses: sepulsa/post-integration-action/route-domain@main
+  uses: sepulsa/post-integration-action/route-domain@ingress
   with:
     action: DELETE
     name: admin.example.com
