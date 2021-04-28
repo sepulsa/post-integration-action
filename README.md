@@ -133,3 +133,48 @@ Valid  values for DNS record `type`: **A** | **AAAA** | **CAA** | **CNAME** | **
     ingress-name: admin
     ingress-namespace: default
 ```
+
+#### Using multiple AWS profiles
+```yaml
+# Configure AWS Credentials for route53
+- name: Configure AWS Credentials
+  uses: aws-actions/configure-aws-credentials@v1
+  with:
+    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    aws-region: ap-southeast-1
+# Configure AWS Credentials for EKS
+- run: |
+    aws configure set aws_access_key_id $EKS_ACCESS_KEY_ID --profile eks
+    aws configure set aws_secret_access_key $EKS_SECRET_ACCESS_KEY --profile eks
+  env:
+    EKS_ACCESS_KEY_ID: ${{ secrets.EKS_ACCESS_KEY_ID }}
+    EKS_SECRET_ACCESS_KEY: ${{ secrets.EKS_SECRET_ACCESS_KEY }}
+# Create kubeconfig for AWS with eks profile
+- name: Create kubeconfig
+  run: aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME --profile eks
+
+- id: create-domain
+  uses: sepulsa/post-integration-action/route-domain@ingress
+  with:
+    action: CREATE
+    name: admin.example.com
+    type: CNAME
+    dns-record: ns.example.com
+    zone-id: ZONEID
+    ingress-name: admin
+    ingress-namespace: default
+    ingress-whitelist-ip: 10.0.0.0/24,172.10.0.1
+    ingress-service-name: service
+    ingress-service-port: 443
+- id: delete-domain
+  uses: sepulsa/post-integration-action/route-domain@ingress
+  with:
+    action: DELETE
+    name: admin.example.com
+    type: CNAME
+    dns-record: ns.example.com
+    zone-id: ZONEID
+    ingress-name: admin
+    ingress-namespace: default
+```
