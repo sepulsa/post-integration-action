@@ -1,10 +1,12 @@
 import {
+  HttpError,
   KubeConfig,
   NetworkingV1beta1Api,
   NetworkingV1beta1Ingress,
   NetworkingV1beta1IngressSpec,
   V1Status,
 } from '@kubernetes/client-node'
+import { Response } from 'request'
 
 interface CreateIngressParams {
   name: string
@@ -24,6 +26,16 @@ function makeApiClient(): NetworkingV1beta1Api {
   kc.loadFromDefault()
 
   return kc.makeApiClient(NetworkingV1beta1Api)
+}
+
+function transformError(e: Error): Error {
+  if (e instanceof HttpError) {
+    const response = e.response as Response
+    const status = response.body as V1Status
+    e.message = status.message || e.message
+  }
+
+  return e
 }
 
 function getAnnotations(params: CreateIngressParams): { [key: string]: string } {
@@ -103,12 +115,7 @@ export async function createIngress(
     const response = await k8sApi.createNamespacedIngress(namespace, body)
     return response.body
   } catch (e) {
-    if (e.response?.body?.reason && e.response?.body?.message) {
-      const { reason, message } = e.response.body
-      e.message = `${reason}: ${message}`
-    }
-
-    throw e
+    throw transformError(e)
   }
 }
 
@@ -118,11 +125,6 @@ export async function deleteIngress(name: string, namespace: string): Promise<V1
     const response = await k8sApi.deleteNamespacedIngress(name, namespace)
     return response.body
   } catch (e) {
-    if (e.response?.body?.reason && e.response?.body?.message) {
-      const { reason, message } = e.response.body
-      e.message = `${reason}: ${message}`
-    }
-
-    throw e
+    throw transformError(e)
   }
 }
