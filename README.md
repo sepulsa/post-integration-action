@@ -52,51 +52,54 @@ This action output release tag based on JIRA Issue key.
     token: ${{ secrets.RELEASE_TOKEN }}
 ```
 
-## Route Domain
-
-This action `CREATE` or `DELETE` ingress for kubernetes and point dns record to ingress endpoint.
+## Create Ingress
+This action creates a kubernetes ingress.
 
 ### Inputs
 |Input|Required|Description|
 |---|:---:|---|
-|`action`|✅|The action to perform. One of `CREATE`, `DELETE`, or `UPSERT`|
-|`name`|✅|Fully  qualified  domain  name|
-|`type`|✅|The DNS record type|
-|`dns-record`|✅|The current or new DNS  record  value|
-|`zone-id`|✅|The ID of the hosted zone that contains the resource record sets that you want to change|
-|`ingress-name`|✅|A client-provided string that refers to an object in a resource URL|
-|`ingress-namespace`|✅|Namespace defines the space within which each name must be unique|
-|`ingress-whitelist-ip`| |Whitelist source range|
-|`ingress-service-name`| |Name of the referenced service|
-|`ingress-service-port`| |Port of the referenced service|
-|`ingress-limit-burst-multiplier`| |Multiplier of the limit rate for burst size|
-|`ingress-limit-connections`| |Number of concurrent connections allowed from a single IP address|
-|`ingress-limit-rps`| |Number of requests accepted from a given IP each second|
-|`tls-secret-name`| |Name of the secret used to terminate TLS traffic on port 443|
-
-Valid  values for DNS record `type`: **A** | **AAAA** | **CAA** | **CNAME** | **DS** | **MX** | **NAPTR** | **NS** | **PTR** | **SOA** | **SPF** | **SRV** | **TX**
+|`name`|✅|A client-provided string that refers to an object in a resource URL|
+|`namespace`|✅|Namespace defines the space within which each name must be unique|
+|`whitelist-ip`|✅|Whitelist source range|
+|`host`|✅|Fully qualified domain name of a network host, as defined by RFC 3986|
+|`service-name`|✅|Name of the referenced service|
+|`service-port`|✅|Port of the referenced service|
+|`limit-burst-multiplier`| |Multiplier of the limit rate for burst size|
+|`limit-connections`| |Number of concurrent connections allowed from a single IP address|
+|`limit-rps`| |Number of requests accepted from a given IP each second|
+|`secret-name`| |Name of the secret used to terminate TLS traffic on port 443|
 
 ### Outputs
 |Output|Description|
 |------|---|
 |`ingress`|Ingress response from kubernetes|
-|`route`|A complex type that contains information about changes made to your hosted zone|
 
 ### Example usage
 
+#### AWS EKS
+
 ```yaml
-# Configure AWS Credentials for route53 API
 - name: Configure AWS Credentials
   uses: aws-actions/configure-aws-credentials@v1
   with:
     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     aws-region: ap-southeast-1
-
-# Create kubeconfig for AWS EKS
 - name: Create kubeconfig
   run: aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME
-# Create kubeconfig for GCP GKE
+
+- uses: sepulsa/post-integration-action/create-ingress@ingress-standalone
+  with:
+    name: admin
+    namespace: default
+    whitelist-ip: 10.0.0.0/24,172.10.0.1
+    host: admin.example.com
+    service-name: service
+    service-port: 443
+```
+
+#### GCP GKE
+```yaml
 - name: Set up Cloud SDK
   uses: google-github-actions/setup-gcloud@v0.2
   with:
@@ -109,72 +112,59 @@ Valid  values for DNS record `type`: **A** | **AAAA** | **CAA** | **CNAME** | **
     cluster_name: $GKE_CLUSTER
     location: $GKE_REGION
 
-- id: create-domain
-  uses: sepulsa/post-integration-action/route-domain@ingress
+- uses: sepulsa/post-integration-action/create-ingress@ingress-standalone
   with:
-    action: CREATE
-    name: admin.example.com
-    type: CNAME
-    dns-record: ns.example.com
-    zone-id: ZONEID
-    ingress-name: admin
-    ingress-namespace: default
-    ingress-whitelist-ip: 10.0.0.0/24,172.10.0.1
-    ingress-service-name: service
-    ingress-service-port: 443
-- id: delete-domain
-  uses: sepulsa/post-integration-action/route-domain@ingress
-  with:
-    action: DELETE
-    name: admin.example.com
-    type: CNAME
-    dns-record: ns.example.com
-    zone-id: ZONEID
-    ingress-name: admin
-    ingress-namespace: default
+    name: admin
+    namespace: default
+    whitelist-ip: 10.0.0.0/24,172.10.0.1
+    host: admin.example.com
+    service-name: service
+    service-port: 443
 ```
 
-#### Using multiple AWS profiles
+## Route Domain
+
+This action `CREATE` or `DELETE` dns record.
+
+### Inputs
+|Input|Required|Description|
+|---|:---:|---|
+|`action`|✅|The action to perform. One of `CREATE`, `DELETE`, or `UPSERT`|
+|`name`|✅|Fully  qualified  domain  name|
+|`type`|✅|The DNS record type|
+|`dns-record`|✅|The current or new DNS  record  value|
+|`zone-id`|✅|The ID of the hosted zone that contains the resource record sets that you want to change|
+
+Valid  values for DNS record `type`: **A** | **AAAA** | **CAA** | **CNAME** | **DS** | **MX** | **NAPTR** | **NS** | **PTR** | **SOA** | **SPF** | **SRV** | **TX**
+
+### Outputs
+|Output|Description|
+|------|---|
+|`route`|A complex type that contains information about changes made to your hosted zone|
+
+### Example usage
+
 ```yaml
-# Configure AWS Credentials for route53
 - name: Configure AWS Credentials
   uses: aws-actions/configure-aws-credentials@v1
   with:
     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     aws-region: ap-southeast-1
-# Configure AWS Credentials for EKS
-- run: |
-    aws configure set aws_access_key_id $EKS_ACCESS_KEY_ID --profile eks
-    aws configure set aws_secret_access_key $EKS_SECRET_ACCESS_KEY --profile eks
-  env:
-    EKS_ACCESS_KEY_ID: ${{ secrets.EKS_ACCESS_KEY_ID }}
-    EKS_SECRET_ACCESS_KEY: ${{ secrets.EKS_SECRET_ACCESS_KEY }}
-# Create kubeconfig for AWS with eks profile
-- name: Create kubeconfig
-  run: aws eks --region $AWS_REGION update-kubeconfig --name $CLUSTER_NAME --profile eks
-
 - id: create-domain
-  uses: sepulsa/post-integration-action/route-domain@ingress
+  uses: sepulsa/post-integration-action/route-domain@main
   with:
     action: CREATE
     name: admin.example.com
     type: CNAME
     dns-record: ns.example.com
     zone-id: ZONEID
-    ingress-name: admin
-    ingress-namespace: default
-    ingress-whitelist-ip: 10.0.0.0/24,172.10.0.1
-    ingress-service-name: service
-    ingress-service-port: 443
 - id: delete-domain
-  uses: sepulsa/post-integration-action/route-domain@ingress
+  uses: sepulsa/post-integration-action/route-domain@main
   with:
     action: DELETE
     name: admin.example.com
     type: CNAME
     dns-record: ns.example.com
     zone-id: ZONEID
-    ingress-name: admin
-    ingress-namespace: default
 ```

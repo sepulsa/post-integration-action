@@ -6,7 +6,6 @@ import {
   Route53Client,
   RRType,
 } from '@aws-sdk/client-route-53'
-import * as ingress from './ingress'
 
 interface ChangeDomainParams {
   action: ChangeAction
@@ -50,40 +49,7 @@ async function run(): Promise<void> {
   const dnsRecord = core.getInput('dns-record', options)
   const zoneId = core.getInput('zone-id', options)
 
-  const ingressName = core.getInput('ingress-name', options)
-  const ingressNamespace = core.getInput('ingress-namespace', options)
-  let servicePort: string | number
-
   try {
-    switch (action) {
-      case 'CREATE':
-        servicePort = core.getInput('ingress-service-port', options)
-        core.setOutput(
-          'ingress',
-          await ingress.createIngress({
-            name: ingressName,
-            namespace: ingressNamespace,
-            whitelistIp: core.getInput('ingress-whitelist-ip', options),
-            host: name,
-            serviceName: core.getInput('ingress-service-name', options),
-            servicePort: Number(servicePort) || servicePort,
-            limitBurstMultiplier: core.getInput('ingress-limit-burst-multiplier'),
-            limitConnections: core.getInput('ingress-limit-connections'),
-            limitRps: core.getInput('ingress-limit-rps'),
-            secretName: core.getInput('tls-secret-name'),
-          }),
-        )
-        break
-
-      case 'DELETE':
-        core.setOutput('ingress', await ingress.deleteIngress(ingressName, ingressNamespace))
-        break
-
-      case 'UPSERT':
-      default:
-        break
-    }
-
     const output = await routeDomain({
       action,
       name,

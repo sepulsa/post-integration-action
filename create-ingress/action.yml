@@ -1,0 +1,41 @@
+name: 'Post-Integration: Route Domain Action'
+description: 'Route domain action for post-integration'
+author: 'sepulsa'
+inputs:
+  name:
+    required: true
+    description: 'A client-provided string that refers to an object in a resource URL'
+  namespace:
+    required: true
+    description: 'Namespace defines the space within which each name must be unique'
+    default: 'default'
+  whitelist-ip:
+    required: true
+    description: 'Whitelist source range'
+  host:
+    required: true
+    description: 'Fully qualified domain name of a network host, as defined by RFC 3986'
+  service-name:
+    required: true
+    description: 'Name of the referenced service'
+  service-port:
+    required: true
+    description: 'Port of the referenced service'
+  limit-burst-multiplier:
+    required: false
+    description: 'Multiplier of the limit rate for burst size'
+  limit-connections:
+    required: false
+    description: 'Number of concurrent connections allowed from a single IP address'
+  limit-rps:
+    required: false
+    description: 'Number of requests accepted from a given IP each second'
+  tls-secret-name:
+    required: false
+    description: 'Name of the secret used to terminate TLS traffic on port 443'
+outputs:
+  ingress:
+    description: 'Ingress response from kubernetes'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
