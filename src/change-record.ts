@@ -1,4 +1,3 @@
-import * as core from '@actions/core'
 import {
   ChangeAction,
   ChangeResourceRecordSetsCommand,
@@ -6,6 +5,7 @@ import {
   Route53Client,
   RRType,
 } from '@aws-sdk/client-route-53'
+import { Credentials } from '@aws-sdk/types'
 
 interface ChangeDomainParams {
   action: ChangeAction
@@ -13,12 +13,25 @@ interface ChangeDomainParams {
   type: RRType
   dnsRecord: string
   zoneId: string
+  accessKeyId?: string
+  secretAccessKey?: string
+  region?: string
 }
 
-export default async function routeDomain(
+export default async function changeRecord(
   params: ChangeDomainParams,
 ): Promise<ChangeResourceRecordSetsCommandOutput> {
-  const client = new Route53Client({})
+  let credentials: Credentials | undefined
+  if (params.accessKeyId && params.secretAccessKey) {
+    credentials = {
+      accessKeyId: params.accessKeyId,
+      secretAccessKey: params.secretAccessKey,
+    }
+  }
+  const client = new Route53Client({
+    credentials,
+    region: params.region,
+  })
 
   const command = new ChangeResourceRecordSetsCommand({
     ChangeBatch: {
@@ -39,28 +52,3 @@ export default async function routeDomain(
 
   return client.send(command)
 }
-
-async function run(): Promise<void> {
-  const options = { required: true }
-
-  const action = core.getInput('action', options).toUpperCase() as ChangeAction
-  const name = core.getInput('name', options)
-  const type = core.getInput('type', options).toUpperCase() as RRType
-  const dnsRecord = core.getInput('dns-record', options)
-  const zoneId = core.getInput('zone-id', options)
-
-  try {
-    const output = await routeDomain({
-      action,
-      name,
-      type,
-      dnsRecord,
-      zoneId,
-    })
-    core.setOutput('route', output)
-  } catch (error) {
-    core.setFailed(error)
-  }
-}
-
-run()

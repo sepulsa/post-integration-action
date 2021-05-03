@@ -17,6 +17,15 @@ inputs:
   zone-id:
     required: true
     description: 'The ID of the hosted zone that contains the resource record sets that you want to change'
+  aws-access-key-id:
+    required: false
+    description: 'AWS Access Key ID'
+  aws-secret-access-key:
+    required: false
+    description: 'AWS Secret Access Key'
+  aws-region:
+    required: false
+    description: 'AWS Region, e.g. ap-southeast-1'
 outputs:
   route:
     description: 'A complex type that contains information about changes made to your hosted zone'

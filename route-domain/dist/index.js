@@ -25,7 +25,60 @@ module.exports = JSON.parse('{"name":"@aws-sdk/client-sts","description":"AWS SD
 
 /***/ }),
 
-/***/ 7373:
+/***/ 7632:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const client_route_53_1 = __nccwpck_require__(2755);
+function changeRecord(params) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let credentials;
+        if (params.accessKeyId && params.secretAccessKey) {
+            credentials = {
+                accessKeyId: params.accessKeyId,
+                secretAccessKey: params.secretAccessKey,
+            };
+        }
+        const client = new client_route_53_1.Route53Client({
+            credentials,
+            region: params.region,
+        });
+        const command = new client_route_53_1.ChangeResourceRecordSetsCommand({
+            ChangeBatch: {
+                Changes: [
+                    {
+                        Action: params.action,
+                        ResourceRecordSet: {
+                            Name: params.name,
+                            Type: params.type,
+                            TTL: 300,
+                            ResourceRecords: [{ Value: params.dnsRecord }],
+                        },
+                    },
+                ],
+            },
+            HostedZoneId: params.zoneId,
+        });
+        return client.send(command);
+    });
+}
+exports.default = changeRecord;
+
+
+/***/ }),
+
+/***/ 4805:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -58,42 +111,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const client_route_53_1 = __nccwpck_require__(2755);
-function routeDomain(params) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const client = new client_route_53_1.Route53Client({});
-        const command = new client_route_53_1.ChangeResourceRecordSetsCommand({
-            ChangeBatch: {
-                Changes: [
-                    {
-                        Action: params.action,
-                        ResourceRecordSet: {
-                            Name: params.name,
-                            Type: params.type,
-                            TTL: 300,
-                            ResourceRecords: [{ Value: params.dnsRecord }],
-                        },
-                    },
-                ],
-            },
-            HostedZoneId: params.zoneId,
-        });
-        return client.send(command);
-    });
-}
-exports.default = routeDomain;
+const change_record_1 = __importDefault(__nccwpck_require__(7632));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const options = { required: true };
+        const accessKeyId = core.getInput('aws-access-key-id');
+        const secretAccessKey = core.getInput('aws-secret-access-key');
+        const region = core.getInput('aws-region');
         const action = core.getInput('action', options).toUpperCase();
         const name = core.getInput('name', options);
         const type = core.getInput('type', options).toUpperCase();
         const dnsRecord = core.getInput('dns-record', options);
         const zoneId = core.getInput('zone-id', options);
         try {
-            const output = yield routeDomain({
+            const output = yield change_record_1.default({
+                accessKeyId,
+                secretAccessKey,
+                region,
                 action,
                 name,
                 type,
@@ -29500,7 +29539,7 @@ module.exports = require("url");;
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(7373);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(4805);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()

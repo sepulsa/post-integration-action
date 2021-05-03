@@ -134,6 +134,9 @@ This action `CREATE` or `DELETE` dns record.
 |`type`|✅|The DNS record type|
 |`dns-record`|✅|The current or new DNS  record  value|
 |`zone-id`|✅|The ID of the hosted zone that contains the resource record sets that you want to change|
+|`aws-access-key-id`| |AWS Access Key ID|
+|`aws-secret-access-key`| |Fully  qualified  domain  name|
+|`aws-region`| |AWS Region, e.g. `ap-southeast-1`|
 
 Valid  values for DNS record `type`: **A** | **AAAA** | **CAA** | **CNAME** | **DS** | **MX** | **NAPTR** | **NS** | **PTR** | **SOA** | **SPF** | **SRV** | **TX**
 
