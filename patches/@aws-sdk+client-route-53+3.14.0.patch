@@ -1,5 +1,5 @@
 diff --git a/node_modules/@aws-sdk/client-route-53/dist/cjs/protocols/Aws_restXml.js b/node_modules/@aws-sdk/client-route-53/dist/cjs/protocols/Aws_restXml.js
-index 9a8089a..752ee5f 100644
+index 9a8089a..a6c9fc7 100644
 --- a/node_modules/@aws-sdk/client-route-53/dist/cjs/protocols/Aws_restXml.js
 +++ b/node_modules/@aws-sdk/client-route-53/dist/cjs/protocols/Aws_restXml.js
 @@ -6992,8 +6992,8 @@ const deserializeAws_restXmlInvalidChangeBatchResponse = async (parsedOutput, co
