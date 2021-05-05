@@ -20,8 +20,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - uses: actions/checkout@v2
-      - run: |
-          npm install
-      - run: |
-          npm run all
+      - run: npm install
+      - run: npm run all
+      - run: git diff --exit-code --ignore-all-space --compact-summary
 
