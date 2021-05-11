@@ -41,16 +41,17 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const exec_1 = __nccwpck_require__(514);
 const yn_1 = __importDefault(__nccwpck_require__(647));
+const state_1 = __importDefault(__nccwpck_require__(249));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const push = yn_1.default(core.getInput('push', { required: true }));
             if (push) {
-                const key = core.getState('KEY');
+                const key = core.getState(state_1.default.KEY);
                 if (key) {
                     yield exec_1.exec('git', ['tag', key]);
                 }
-                const tag = core.getState('TAG');
+                const tag = core.getState(state_1.default.TAG);
                 if (tag) {
                     yield exec_1.exec('git', ['tag', tag]);
                 }
@@ -63,6 +64,23 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 249:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var State;
+(function (State) {
+    State["KEY"] = "KEY";
+    State["PRERELEASE_TAG"] = "PRERELEASE_TAG";
+    State["RELEASE_TAG"] = "RELEASE_TAG";
+    State["TAG"] = "TAG";
+})(State || (State = {}));
+exports.default = State;
 
 
 /***/ }),

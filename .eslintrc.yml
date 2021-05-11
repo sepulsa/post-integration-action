@@ -23,6 +23,9 @@ rules:
     - ts: never
       test.ts: never
   import/no-namespace: 'off'
+  no-shadow:
+    - error
+    - allow: [ 'State' ]
 
   eslint-comments/no-use: 'off'
   no-unused-vars: 'off'

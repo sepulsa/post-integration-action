@@ -56,6 +56,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const find_key_1 = __importDefault(__nccwpck_require__(1731));
+const state_1 = __importDefault(__nccwpck_require__(9249));
 const tag_1 = __nccwpck_require__(2829);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -66,8 +67,8 @@ function run() {
                 return;
             }
             const tag = yield core.group('Get prerelease tag', () => __awaiter(this, void 0, void 0, function* () { return tag_1.prereleaseTag(); }));
-            core.saveState('KEY', key);
-            core.saveState('TAG', tag);
+            core.saveState(state_1.default.KEY, key);
+            core.saveState(state_1.default.TAG, tag);
             core.setOutput('key', key);
             core.setOutput('tag', tag);
         }
@@ -77,6 +78,24 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 9249:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var State;
+(function (State) {
+    State["KEY"] = "KEY";
+    State["PRERELEASE_TAG"] = "PRERELEASE_TAG";
+    State["RELEASE_TAG"] = "RELEASE_TAG";
+    State["TAG"] = "TAG";
+})(State || (State = {}));
+exports.default = State;
 
 
 /***/ }),
