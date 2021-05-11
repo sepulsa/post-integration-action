@@ -55,8 +55,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const exec_1 = __nccwpck_require__(1514);
-const yn_1 = __importDefault(__nccwpck_require__(9647));
 const find_key_1 = __importDefault(__nccwpck_require__(1731));
 const tag_1 = __nccwpck_require__(2829);
 function run() {
@@ -68,12 +66,8 @@ function run() {
                 return;
             }
             const tag = yield core.group('Get prerelease tag', () => __awaiter(this, void 0, void 0, function* () { return tag_1.prereleaseTag(); }));
-            const push = yn_1.default(core.getInput('push', { required: true }));
-            if (push) {
-                yield exec_1.exec('git', ['tag', key]);
-                yield exec_1.exec('git', ['tag', tag]);
-                yield exec_1.exec('git', ['push', '--tags']);
-            }
+            core.saveState('KEY', key);
+            core.saveState('TAG', tag);
             core.setOutput('key', key);
             core.setOutput('tag', tag);
         }
@@ -4814,156 +4808,6 @@ try {
   // add if support for Symbol.iterator is present
   __nccwpck_require__(4091)(Yallist)
 } catch (er) {}
-
-
-/***/ }),
-
-/***/ 9647:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-const lenientFunction = __nccwpck_require__(266);
-
-const yn = (value, {
-	lenient = false,
-	default: default_
-} = {}) => {
-	value = String(value).trim();
-
-	if (default_ !== undefined && typeof default_ !== 'boolean') {
-		throw new TypeError(`Expected the \`default\` option to be of type \`boolean\`, got \`${typeof default_}\``);
-	}
-
-	if (/^(?:y|yes|true|1|on)$/i.test(value)) {
-		return true;
-	}
-
-	if (/^(?:n|no|false|0|off)$/i.test(value)) {
-		return false;
-	}
-
-	if (lenient === true) {
-		return lenientFunction(value, default_);
-	}
-
-	return default_;
-};
-
-module.exports = yn;
-
-
-/***/ }),
-
-/***/ 266:
-/***/ ((module) => {
-
-"use strict";
-
-
-const YES_MATCH_SCORE_THRESHOLD = 2;
-const NO_MATCH_SCORE_THRESHOLD = 1.25;
-
-const yMatch = new Map([
-	[5, 0.25],
-	[6, 0.25],
-	[7, 0.25],
-	['t', 0.75],
-	['y', 1],
-	['u', 0.75],
-	['g', 0.25],
-	['h', 0.25],
-	['j', 0.25]
-]);
-
-const eMatch = new Map([
-	[2, 0.25],
-	[3, 0.25],
-	[4, 0.25],
-	['w', 0.75],
-	['e', 1],
-	['r', 0.75],
-	['s', 0.25],
-	['d', 0.25],
-	['f', 0.25]
-]);
-
-const sMatch = new Map([
-	['q', 0.25],
-	['w', 0.25],
-	['e', 0.25],
-	['a', 0.75],
-	['s', 1],
-	['d', 0.75],
-	['z', 0.25],
-	['x', 0.25],
-	['c', 0.25]
-]);
-
-const nMatch = new Map([
-	['h', 0.25],
-	['j', 0.25],
-	['k', 0.25],
-	['b', 0.75],
-	['n', 1],
-	['m', 0.75]
-]);
-
-const oMatch = new Map([
-	[9, 0.25],
-	[0, 0.25],
-	['i', 0.75],
-	['o', 1],
-	['p', 0.75],
-	['k', 0.25],
-	['l', 0.25]
-]);
-
-function getYesMatchScore(value) {
-	const [y, e, s] = value;
-	let score = 0;
-
-	if (yMatch.has(y)) {
-		score += yMatch.get(y);
-	}
-
-	if (eMatch.has(e)) {
-		score += eMatch.get(e);
-	}
-
-	if (sMatch.has(s)) {
-		score += sMatch.get(s);
-	}
-
-	return score;
-}
-
-function getNoMatchScore(value) {
-	const [n, o] = value;
-	let score = 0;
-
-	if (nMatch.has(n)) {
-		score += nMatch.get(n);
-	}
-
-	if (oMatch.has(o)) {
-		score += oMatch.get(o);
-	}
-
-	return score;
-}
-
-module.exports = (input, default_) => {
-	if (getYesMatchScore(input) >= YES_MATCH_SCORE_THRESHOLD) {
-		return true;
-	}
-
-	if (getNoMatchScore(input) >= NO_MATCH_SCORE_THRESHOLD) {
-		return false;
-	}
-
-	return default_;
-};
 
 
 /***/ }),

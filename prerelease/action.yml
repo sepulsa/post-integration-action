@@ -17,3 +17,5 @@ outputs:
 runs:
   using: 'node12'
   main: 'dist/index.js'
+  post: 'dist/push/index.js'
+  post-if: 'success()'

@@ -1,6 +1,4 @@
 import * as core from '@actions/core'
-import { exec } from '@actions/exec'
-import yn from 'yn'
 import findKey from './find-key'
 import { prereleaseTag } from './tag'
 
@@ -12,13 +10,8 @@ async function run(): Promise<void> {
       return
     }
     const tag = await core.group('Get prerelease tag', async () => prereleaseTag())
-
-    const push = yn(core.getInput('push', { required: true }))
-    if (push) {
-      await exec('git', ['tag', key])
-      await exec('git', ['tag', tag])
-      await exec('git', ['push', '--tags'])
-    }
+    core.saveState('KEY', key)
+    core.saveState('TAG', tag)
 
     core.setOutput('key', key)
     core.setOutput('tag', tag)
