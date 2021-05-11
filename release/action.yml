@@ -18,3 +18,5 @@ outputs:
 runs:
   using: 'node12'
   main: 'dist/index.js'
+  post: 'dist/teardown/index.js'
+  post-if: 'success()'
