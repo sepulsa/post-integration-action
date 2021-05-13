@@ -1,4 +1,4 @@
-require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
+/******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
@@ -1902,4 +1902,3 @@ module.exports = require("util");;
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=index.js.map
