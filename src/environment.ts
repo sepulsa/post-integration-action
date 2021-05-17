@@ -12,7 +12,7 @@ export default async function deleteEnvironment(token: string, key: string): Pro
   })
 
   try {
-    const { status } = await octokit.repos.deleteAnEnvironment({
+    const { status } = await octokit.rest.repos.deleteAnEnvironment({
       environment_name: `staging:${key}`,
       ...github.context.repo,
     })
