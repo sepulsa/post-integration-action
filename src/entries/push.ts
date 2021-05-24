@@ -1,11 +1,10 @@
 import * as core from '@actions/core'
 import { exec } from '@actions/exec'
-import yn from 'yn'
 import State from '../state'
 
 async function run(): Promise<void> {
   try {
-    const push = yn(core.getInput('push', { required: true }))
+    const push = core.getBooleanInput('push', { required: true })
     if (push) {
       const key = core.getState(State.KEY)
       if (key) {

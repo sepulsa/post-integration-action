@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
 import { exec } from '@actions/exec'
-import yn from 'yn'
 import deleteEnvironment from '../environment'
 import State from '../state'
 
@@ -8,7 +7,7 @@ async function run(): Promise<void> {
   try {
     const key = core.getState(State.KEY)
 
-    const push = yn(core.getInput('push', { required: true }))
+    const push = core.getBooleanInput('push', { required: true })
     if (push) {
       const prereleaseTag = core.getState(State.PRERELEASE_TAG)
       const releaseTag = core.getState(State.RELEASE_TAG)

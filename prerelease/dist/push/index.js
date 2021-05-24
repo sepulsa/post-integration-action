@@ -40,12 +40,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(186));
 const exec_1 = __nccwpck_require__(514);
-const yn_1 = __importDefault(__nccwpck_require__(647));
 const state_1 = __importDefault(__nccwpck_require__(249));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const push = yn_1.default(core.getInput('push', { required: true }));
+            const push = core.getBooleanInput('push', { required: true });
             if (push) {
                 const key = core.getState(state_1.default.KEY);
                 if (key) {
@@ -89,14 +88,27 @@ exports.default = State;
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.issue = exports.issueCommand = void 0;
 const os = __importStar(__nccwpck_require__(87));
 const utils_1 = __nccwpck_require__(278);
 /**
@@ -174,6 +186,25 @@ function escapeProperty(s) {
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -183,14 +214,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
 const command_1 = __nccwpck_require__(351);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(278);
@@ -257,7 +282,9 @@ function addPath(inputPath) {
 }
 exports.addPath = addPath;
 /**
- * Gets the value of an input.  The value is also trimmed.
+ * Gets the value of an input.
+ * Unless trimWhitespace is set to false in InputOptions, the value is also trimmed.
+ * Returns an empty string if the value is not defined.
  *
  * @param     name     name of the input to get
  * @param     options  optional. See InputOptions.
@@ -270,9 +297,34 @@ function getInput(name, options) {
     if (options && options.required && !val) {
         throw new Error(`Input required and not supplied: ${name}`);
     }
+    if (options && options.trimWhitespace === false) {
+        return val;
+    }
     return val.trim();
 }
 exports.getInput = getInput;
+/**
+ * Gets the input value of the boolean type in the YAML 1.2 "core schema" specification.
+ * Support boolean input list: `true | True | TRUE | false | False | FALSE` .
+ * The return value is also in boolean type.
+ * ref: https://yaml.org/spec/1.2/spec.html#id2804923
+ *
+ * @param     name     name of the input to get
+ * @param     options  optional. See InputOptions.
+ * @returns   boolean
+ */
+function getBooleanInput(name, options) {
+    const trueValue = ['true', 'True', 'TRUE'];
+    const falseValue = ['false', 'False', 'FALSE'];
+    const val = getInput(name, options);
+    if (trueValue.includes(val))
+        return true;
+    if (falseValue.includes(val))
+        return false;
+    throw new TypeError(`Input does not meet YAML 1.2 "Core Schema" specification: ${name}\n` +
+        `Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
+}
+exports.getBooleanInput = getBooleanInput;
 /**
  * Sets the value of an output.
  *
@@ -415,7 +467,6 @@ function getState(name) {
 exports.getState = getState;
 //# sourceMappingURL=core.js.map
 
-
 /***/ }),
 
 /***/ 717:
@@ -423,14 +474,27 @@ exports.getState = getState;
 
 
 // For internal use, subject to change.
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.issueCommand = void 0;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fs = __importStar(__nccwpck_require__(747));
@@ -460,6 +524,7 @@ exports.issueCommand = issueCommand;
 // We use any as a valid input type
 /* eslint-disable @typescript-eslint/no-explicit-any */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.toCommandValue = void 0;
 /**
  * Sanitizes an input into a string so it can be passed into issueCommand safely
  * @param input input to sanitize into a string
@@ -1657,154 +1722,6 @@ function copyFile(srcFile, destFile, force) {
     });
 }
 //# sourceMappingURL=io.js.map
-
-/***/ }),
-
-/***/ 647:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-
-const lenientFunction = __nccwpck_require__(266);
-
-const yn = (value, {
-	lenient = false,
-	default: default_
-} = {}) => {
-	value = String(value).trim();
-
-	if (default_ !== undefined && typeof default_ !== 'boolean') {
-		throw new TypeError(`Expected the \`default\` option to be of type \`boolean\`, got \`${typeof default_}\``);
-	}
-
-	if (/^(?:y|yes|true|1|on)$/i.test(value)) {
-		return true;
-	}
-
-	if (/^(?:n|no|false|0|off)$/i.test(value)) {
-		return false;
-	}
-
-	if (lenient === true) {
-		return lenientFunction(value, default_);
-	}
-
-	return default_;
-};
-
-module.exports = yn;
-
-
-/***/ }),
-
-/***/ 266:
-/***/ ((module) => {
-
-
-
-const YES_MATCH_SCORE_THRESHOLD = 2;
-const NO_MATCH_SCORE_THRESHOLD = 1.25;
-
-const yMatch = new Map([
-	[5, 0.25],
-	[6, 0.25],
-	[7, 0.25],
-	['t', 0.75],
-	['y', 1],
-	['u', 0.75],
-	['g', 0.25],
-	['h', 0.25],
-	['j', 0.25]
-]);
-
-const eMatch = new Map([
-	[2, 0.25],
-	[3, 0.25],
-	[4, 0.25],
-	['w', 0.75],
-	['e', 1],
-	['r', 0.75],
-	['s', 0.25],
-	['d', 0.25],
-	['f', 0.25]
-]);
-
-const sMatch = new Map([
-	['q', 0.25],
-	['w', 0.25],
-	['e', 0.25],
-	['a', 0.75],
-	['s', 1],
-	['d', 0.75],
-	['z', 0.25],
-	['x', 0.25],
-	['c', 0.25]
-]);
-
-const nMatch = new Map([
-	['h', 0.25],
-	['j', 0.25],
-	['k', 0.25],
-	['b', 0.75],
-	['n', 1],
-	['m', 0.75]
-]);
-
-const oMatch = new Map([
-	[9, 0.25],
-	[0, 0.25],
-	['i', 0.75],
-	['o', 1],
-	['p', 0.75],
-	['k', 0.25],
-	['l', 0.25]
-]);
-
-function getYesMatchScore(value) {
-	const [y, e, s] = value;
-	let score = 0;
-
-	if (yMatch.has(y)) {
-		score += yMatch.get(y);
-	}
-
-	if (eMatch.has(e)) {
-		score += eMatch.get(e);
-	}
-
-	if (sMatch.has(s)) {
-		score += sMatch.get(s);
-	}
-
-	return score;
-}
-
-function getNoMatchScore(value) {
-	const [n, o] = value;
-	let score = 0;
-
-	if (nMatch.has(n)) {
-		score += nMatch.get(n);
-	}
-
-	if (oMatch.has(o)) {
-		score += oMatch.get(o);
-	}
-
-	return score;
-}
-
-module.exports = (input, default_) => {
-	if (getYesMatchScore(input) >= YES_MATCH_SCORE_THRESHOLD) {
-		return true;
-	}
-
-	if (getNoMatchScore(input) >= NO_MATCH_SCORE_THRESHOLD) {
-		return false;
-	}
-
-	return default_;
-};
-
 
 /***/ }),
 
