@@ -39,7 +39,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.15.0",
     "@babel/preset-typescript": "^7.15.0",
-    "@octokit/request-error": "^2.0.5",
+    "@octokit/request-error": "^2.1.0",
     "@types/jest": "^26.0.23",
     "@types/node": "^15.12.5",
     "@types/semver": "^7.3.6",
