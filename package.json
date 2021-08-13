@@ -41,7 +41,7 @@
     "@babel/preset-typescript": "^7.15.0",
     "@octokit/request-error": "^2.1.0",
     "@types/jest": "^26.0.23",
-    "@types/node": "^15.12.5",
+    "@types/node": "^16.6.1",
     "@types/semver": "^7.3.8",
     "@typescript-eslint/parser": "^4.26.0",
     "@vercel/ncc": "^0.28.6",
