@@ -43,7 +43,7 @@
     "@types/jest": "^27.0.1",
     "@types/node": "^16.6.1",
     "@types/semver": "^7.3.8",
-    "@typescript-eslint/parser": "^4.26.0",
+    "@typescript-eslint/parser": "^4.30.0",
     "@vercel/ncc": "^0.28.6",
     "eslint": "^7.29.0",
     "eslint-config-airbnb-base": "^14.2.1",
