@@ -20,6 +20,7 @@ rules:
   filenames/match-regex:
     - error
     - '^[a-z0-9-]+(\.test)?(.d)?$'
+  i18n-text/no-en: 'off'
   import/extensions:
     - error
     - ignorePackages
