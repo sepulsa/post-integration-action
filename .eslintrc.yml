@@ -17,6 +17,9 @@ rules:
   camelcase:
     - error
     - allow: [ environment_name ]
+  filenames/match-regex:
+    - error
+    - '^[a-z0-9-]+(\.test)?(.d)?$'
   import/extensions:
     - error
     - ignorePackages
