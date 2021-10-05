@@ -20,6 +20,12 @@ rules:
   filenames/match-regex:
     - error
     - '^[a-z0-9-]+(\.test)?(.d)?$'
+  no-shadow:
+    - error
+    - allow: [ 'State' ]
+  no-unused-vars: 'off'
+  sort-imports: 'off'
+  eslint-comments/no-use: 'off'
   i18n-text/no-en: 'off'
   import/extensions:
     - error
@@ -27,12 +33,6 @@ rules:
     - ts: never
       test.ts: never
   import/no-namespace: 'off'
-  no-shadow:
-    - error
-    - allow: [ 'State' ]
-
-  eslint-comments/no-use: 'off'
-  no-unused-vars: 'off'
   "@typescript-eslint/no-unused-vars": error
   "@typescript-eslint/explicit-member-accessibility":
     - error
