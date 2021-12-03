@@ -1,11 +1,11 @@
 import * as core from '@actions/core'
-import findKey from './find-key'
 import State from './state'
-import { prereleaseTag } from './tag'
+import findKey from './find-key'
+import {prereleaseTag} from './tag'
 
 async function run(): Promise<void> {
   try {
-    const key = findKey(core.getInput('branch', { required: true }))
+    const key = findKey(core.getInput('branch', {required: true}))
     if (key === undefined) {
       core.info("Can't find JIRA issue key")
       return
@@ -17,7 +17,7 @@ async function run(): Promise<void> {
     core.setOutput('key', key)
     core.setOutput('tag', tag)
   } catch (error) {
-    core.setFailed(error.message)
+    if (error instanceof Error) core.setFailed(error.message)
   }
 }
 

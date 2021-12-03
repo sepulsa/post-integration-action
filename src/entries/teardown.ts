@@ -1,13 +1,13 @@
 import * as core from '@actions/core'
-import { exec } from '@actions/exec'
-import deleteEnvironment from '../environment'
 import State from '../state'
+import deleteEnvironment from '../environment'
+import {exec} from '@actions/exec'
 
 async function run(): Promise<void> {
   try {
     const key = core.getState(State.KEY)
 
-    const push = core.getBooleanInput('push', { required: true })
+    const push = core.getBooleanInput('push', {required: true})
     if (push) {
       const prereleaseTag = core.getState(State.PRERELEASE_TAG)
       const releaseTag = core.getState(State.RELEASE_TAG)
@@ -24,10 +24,10 @@ async function run(): Promise<void> {
       })
     }
 
-    const token = core.getInput('token', { required: true })
+    const token = core.getInput('token', {required: true})
     await deleteEnvironment(token, key)
   } catch (error) {
-    core.setFailed(error.message)
+    if (error instanceof Error) core.setFailed(error.message)
   }
 }
 

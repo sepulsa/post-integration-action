@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+import {RequestError} from '@octokit/request-error'
 
 export default async function deleteEnvironment(token: string, key: string): Promise<number> {
   const octokit = github.getOctokit(token, {
@@ -7,18 +8,20 @@ export default async function deleteEnvironment(token: string, key: string): Pro
       debug: core.debug,
       info: core.info,
       warn: core.warning,
-      error: core.error,
-    },
+      error: core.error
+    }
   })
 
   try {
-    const { status } = await octokit.rest.repos.deleteAnEnvironment({
+    const {status} = await octokit.rest.repos.deleteAnEnvironment({
       environment_name: `staging:${key}`,
-      ...github.context.repo,
+      ...github.context.repo
     })
     return status
   } catch (error) {
-    core.warning(error)
-    return error.status
+    if (error instanceof Error) core.warning(error)
+    if (error instanceof RequestError) return error.status
+
+    throw error
   }
 }

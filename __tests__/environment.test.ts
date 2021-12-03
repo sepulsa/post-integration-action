@@ -1,21 +1,21 @@
 import * as github from '@actions/github'
-import { RequestError } from '@octokit/request-error'
+import {RequestError} from '@octokit/request-error'
 import deleteEnvironment from '../src/environment'
 
 jest.mock('@actions/github', () => ({
   getOctokit: jest.fn().mockReturnValue({
     rest: {
       repos: {
-        deleteAnEnvironment: jest.fn(),
-      },
-    },
+        deleteAnEnvironment: jest.fn()
+      }
+    }
   }),
   context: {
     repo: {
       owner: undefined,
-      repo: undefined,
-    },
-  },
+      repo: undefined
+    }
+  }
 }))
 
 test('Delete invalid environment', async () => {
@@ -25,9 +25,9 @@ test('Delete invalid environment', async () => {
       request: {
         method: 'DELETE',
         url: '',
-        headers: {},
-      },
-    }),
+        headers: {}
+      }
+    })
   )
 
   const key = 'JIRA-404'
@@ -40,7 +40,7 @@ test('Delete environment', async () => {
     headers: {},
     url: '',
     data: undefined as never,
-    status: 204,
+    status: 204
   })
 
   const key = 'JIRA-204'

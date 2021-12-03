@@ -1,10 +1,10 @@
 import * as core from '@actions/core'
+import {prereleaseTagFromKey, releaseTagFromPrerelease} from './tag'
 import State from './state'
-import { prereleaseTagFromKey, releaseTagFromPrerelease } from './tag'
 
 async function run(): Promise<void> {
   try {
-    const key = core.getInput('key', { required: true }).toUpperCase()
+    const key = core.getInput('key', {required: true}).toUpperCase()
     const prereleaseTag = await prereleaseTagFromKey(key)
     if (prereleaseTag === undefined) {
       core.setFailed("Can't find prerelease tag")
@@ -18,7 +18,7 @@ async function run(): Promise<void> {
 
     core.setOutput('tag', releaseTag)
   } catch (error) {
-    core.setFailed(error.message)
+    if (error instanceof Error) core.setFailed(error.message)
   }
 }
 

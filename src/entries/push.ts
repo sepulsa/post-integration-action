@@ -1,10 +1,10 @@
 import * as core from '@actions/core'
-import { exec } from '@actions/exec'
 import State from '../state'
+import {exec} from '@actions/exec'
 
 async function run(): Promise<void> {
   try {
-    const push = core.getBooleanInput('push', { required: true })
+    const push = core.getBooleanInput('push', {required: true})
     if (push) {
       const key = core.getState(State.KEY)
       if (key) {
@@ -19,7 +19,7 @@ async function run(): Promise<void> {
       await exec('git', ['push', '--tags'])
     }
   } catch (error) {
-    core.setFailed(error.message)
+    if (error instanceof Error) core.setFailed(error.message)
   }
 }
 

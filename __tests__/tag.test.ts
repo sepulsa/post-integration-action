@@ -1,5 +1,5 @@
-import { exec, ExecOptions } from '@actions/exec'
-import { prereleaseTag, prereleaseTagFromKey, releaseTagFromPrerelease } from '../src/tag'
+import {ExecOptions, exec} from '@actions/exec'
+import {prereleaseTag, prereleaseTagFromKey, releaseTagFromPrerelease} from '../src/tag'
 
 jest.mock('@actions/exec')
 const mockedExec = exec as jest.Mock<Promise<number>>
@@ -13,7 +13,7 @@ function mockExecImplementation(data?: Buffer): void {
       }
 
       return 1
-    },
+    }
   )
 }
 
@@ -27,7 +27,7 @@ describe('prereleaseTag', () => {
     [Buffer.from('1.1.0\nv1.2.0'), '1.3.0-rc.0'],
     [Buffer.from('1.2.0\nv1.1.0'), '1.3.0-rc.0'],
     [Buffer.from('v1.1.0\n1.2.0'), '1.3.0-rc.0'],
-    [Buffer.from('v1.2.0\n1.1.0'), '1.3.0-rc.0'],
+    [Buffer.from('v1.2.0\n1.1.0'), '1.3.0-rc.0']
   ]
   test.concurrent.each(TEST_CASES)('Test case #%#', async (tags, expected) => {
     mockExecImplementation(tags)
