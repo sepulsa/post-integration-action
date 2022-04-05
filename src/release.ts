@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
-import {prereleaseTagFromKey, releaseTagFromPrerelease} from './tag'
-import State from './state'
+import {prereleaseTagFromKey, releaseTagFromPrerelease} from './utils/tag'
+import State from './utils/state'
 
 async function run(): Promise<void> {
   try {

@@ -1,6 +1,6 @@
 import * as github from '@actions/github'
 import {RequestError} from '@octokit/request-error'
-import deleteEnvironment from '../src/environment'
+import deleteEnvironment from '../src/utils/environment'
 
 jest.mock('@actions/github', () => ({
   getOctokit: jest.fn().mockReturnValue({

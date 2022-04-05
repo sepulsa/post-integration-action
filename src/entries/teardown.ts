@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
-import State from '../state'
-import deleteEnvironment from '../environment'
+import State from '../utils/state'
+import deleteEnvironment from '../utils/environment'
 import {exec} from '@actions/exec'
 
 async function run(): Promise<void> {

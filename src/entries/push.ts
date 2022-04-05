@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import State from '../state'
+import State from '../utils/state'
 import {exec} from '@actions/exec'
 
 async function run(): Promise<void> {

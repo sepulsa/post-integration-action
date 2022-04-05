@@ -1,5 +1,5 @@
 import {ExecOptions, exec} from '@actions/exec'
-import {prereleaseTag, prereleaseTagFromKey, releaseTagFromPrerelease} from '../src/tag'
+import {prereleaseTag, prereleaseTagFromKey, releaseTagFromPrerelease} from '../src/utils/tag'
 
 jest.mock('@actions/exec')
 const mockedExec = exec as jest.Mock<Promise<number>>

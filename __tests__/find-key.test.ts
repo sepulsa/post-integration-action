@@ -1,4 +1,4 @@
-import findKey from '../src/find-key'
+import findKey from '../src/utils/find-key'
 
 const TEST_CASES: [string, string | undefined][] = [
   ['feature/jira-123-branch', 'JIRA-123'],

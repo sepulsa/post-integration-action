@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
-import State from './state'
-import findKey from './find-key'
-import {prereleaseTag} from './tag'
+import State from './utils/state'
+import findKey from './utils/find-key'
+import {prereleaseTag} from './utils/tag'
 
 async function run(): Promise<void> {
   try {
